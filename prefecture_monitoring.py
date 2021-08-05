@@ -1,12 +1,16 @@
 from selenium import webdriver
 import time, datetime, random, codecs
 
+
+### need configuration file
 i = 0
 s = 20
 jit = 10
 links = ["www.essonne.gouv.fr/booking/create/23014/0"]
 
-dir = "C:\\Users\\Benoit\\Documents\\Dev\\Webscrapping_script\\"
+
+dir = "/home/data/"
+
 
 for link in links :
     view = {'output': dir + "prefecture_" ,
