@@ -82,9 +82,11 @@ with webdriver.Firefox(firefox_options=firefox_options) as driver:
         if form[0].text == "Il n'existe plus de plage horaire libre pour votre demande de rendez-vous. Veuillez recommencer ultérieurement.":
             continue
   
-        with codecs.open(view['output'] + timestamp + '.html') as fid:
-            fid.write(driver.page_source)
+
 
         driver.save_screenshot(view['output'] + timestamp + '.png')
+
+        with codecs.open(view['output'] + timestamp + '.html','w+') as fid:
+            fid.write(driver.page_source)
 
         i = (i+1)%5
