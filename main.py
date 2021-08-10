@@ -32,6 +32,17 @@ def random_number_gen(n):
 
 with webdriver.Firefox(firefox_options=firefox_options) as driver:
 
+    timestamp = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
+
+    driver.set_window_size(view['width'], view['height'])
+    driver.get(linkWithProtocol)
+    time.sleep(s+random_number_gen(jit))
+
+    
+
+    with codecs.open('test.html','w+',"utf-8") as fid:
+        fid.write(driver.page_source)
+
     while True:
 
         timestamp = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
@@ -86,7 +97,7 @@ with webdriver.Firefox(firefox_options=firefox_options) as driver:
 
         driver.save_screenshot(view['output'] + timestamp + '.png')
 
-        with codecs.open(view['output'] + timestamp + '.html','w+') as fid:
+        with codecs.open(view['output'] + timestamp + '.html','w+',"utf-8") as fid:
             fid.write(driver.page_source)
 
         i = (i+1)%5
