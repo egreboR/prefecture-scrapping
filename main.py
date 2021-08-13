@@ -93,7 +93,21 @@ with webdriver.Firefox(firefox_options=firefox_options) as driver:
         if form[0].text == "Il n'existe plus de plage horaire libre pour votre demande de rendez-vous. Veuillez recommencer ultérieurement.":
             continue
   
+        
 
+        try :
+            guichet_list = driver.find_elements_by_class_name("radio")
+            nextButton = driver.find_element_by_name("nextButton")
+        except:
+            guichet_list = None
+            nextButton = None
+
+        if not guichet_list or not nextButton:
+            continue
+
+        guichet_list[i].click()
+        nextButton.click()
+        time.sleep(s+random_number_gen(jit))
 
         driver.save_screenshot(view['output'] + timestamp + '.png')
 
