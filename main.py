@@ -9,8 +9,10 @@ import time, datetime, random, codecs
 
 ### need configuration file
 i = 0
-s = 20
-jit = 10
+jit_s = 4
+s = 10
+jit_l = 30
+l = 60
 links = ["www.essonne.gouv.fr/booking/create/23014/0"]
 
 
@@ -36,7 +38,7 @@ with webdriver.Firefox(firefox_options=firefox_options) as driver:
 
     driver.set_window_size(view['width'], view['height'])
     driver.get(linkWithProtocol)
-    time.sleep(s+random_number_gen(jit))
+    time.sleep(l+random_number_gen(jit_l))
 
     
 
@@ -50,7 +52,7 @@ with webdriver.Firefox(firefox_options=firefox_options) as driver:
         
         driver.set_window_size(view['width'], view['height'])
         driver.get(linkWithProtocol)
-        time.sleep(s+random_number_gen(jit))
+        time.sleep(l+random_number_gen(jit_l))
 
         try:
             condition = driver.find_element_by_id("condition")
@@ -64,7 +66,7 @@ with webdriver.Firefox(firefox_options=firefox_options) as driver:
 
         condition.click()
         nextButton.click()
-        time.sleep(s+random_number_gen(jit))
+        time.sleep(s+random_number_gen(jit_s))
 
 
         try :
@@ -79,7 +81,7 @@ with webdriver.Firefox(firefox_options=firefox_options) as driver:
 
         guichet_list[i].click()
         nextButton.click()
-        time.sleep(s+random_number_gen(jit))
+        time.sleep(s+random_number_gen(jit_s))
 
         try:
             form = driver.find_elements_by_xpath("//form[@id='FormBookingCreate']")
@@ -87,7 +89,6 @@ with webdriver.Firefox(firefox_options=firefox_options) as driver:
             form = None
             
         if not form:
-            driver.save_screenshot(view['output'] + timestamp + '.png')
             continue
 
         if form[0].text == "Il n'existe plus de plage horaire libre pour votre demande de rendez-vous. Veuillez recommencer ultérieurement.":
@@ -103,11 +104,12 @@ with webdriver.Firefox(firefox_options=firefox_options) as driver:
             nextButton = None
 
         if not guichet_list or not nextButton:
+            driver.save_screenshot(view['output'] + timestamp + '.png')
             continue
 
         guichet_list[i].click()
         nextButton.click()
-        time.sleep(s+random_number_gen(jit))
+        time.sleep(s+random_number_gen(jit_s))
 
         driver.save_screenshot(view['output'] + timestamp + '.png')
 
