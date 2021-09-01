@@ -1,162 +1,149 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
 
-
-
 from selenium import webdriver
-import time, datetime, random, codecs
+import time, datetime, random, codecs, os, logging
 
+
+
+if os.getenv('ISK8S'):
+    dir = "/home/data/"
+else:
+    dir = "./"
+
+
+logging.basicConfig(filename=os.path.join(dir,'prefecture-scrapping.log'), level=logging.DEBUG)
 
 ### need configuration file
-i = 0
-jit_s = 2
-s = 15
-jit_l = 10
-l = 30
-links = ["www.essonne.gouv.fr/booking/create/23014/0"]
+BUFFER_JIT = 2
+BUFFER = 15
 NTRIAL = 5
-
-dir = "/home/data/"
-# dir = "./"
-
-for link in links :
-    view = {'output': dir + "prefecture_" ,
-                'width': 1000,
-                'height': 800}
-    linkWithProtocol = 'https://' + str(link)
-
-firefox_options = webdriver.FirefoxOptions()
-firefox_options.set_headless() 
 
 
 def random_number_gen(n):
     return random.random()*n - n/2
 
-with webdriver.Firefox(firefox_options=firefox_options) as driver:
-
-    timestamp = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
-
-    driver.set_window_size(view['width'], view['height'])
-    driver.get(linkWithProtocol)
-    time.sleep(l+random_number_gen(jit_l))
-    page_1 = "Cliquez la case pour accepter les conditions d'utilisation avant de continuer le processus de prise de rendez-vous."
-    page_2 = "Choix de la nature du rendez-vous"
-
-    while True:
 
 
+class WebCrawler():
 
-        timestamp = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
-        print(timestamp)
+    def __init__(self,driver,options):
+        self.driver = driver
+        self.ntrial = options['NTRIAL']
+        self.buffer = options['BUFFER']
+        self.jit = options['BUFFER_JIT']
+        self.crawlpath = []
 
-        time.sleep(l+random_number_gen(jit_l))
-        driver.set_window_size(view['width'], view['height'])
-        try:
-            driver.get(linkWithProtocol)
-        except:
-            continue
+    def Main(self):
+        while True:
+            time.sleep(self.buffer + self.jit)
+            self.timestamp = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
+            print(self.timestamp)
+            self.Crawl()
 
-        time.sleep(l+random_number_gen(jit_l))
-        ### test if we are in the page
+    def Crawl(self):
 
+        for interaction in self.crawlpath:
+            trial = self.InteractWPage(interaction)
+            if trial >= self.ntrial:
+                break
+
+    def InteractWPage(self,func):
+        logging.info(f"interacting with {func.__name__}")
         isloaded = False
-        trial = 0
-        while trial < NTRIAL :
-
+        trial = 0            
+        while trial < self.ntrial and not isloaded:
             trial+=1
-            time.sleep(s+random_number_gen(jit_s))
+            time.sleep(self.buffer + self.jit)      
             try:
-                condition = driver.find_element_by_id("condition")
-                nextButton = driver.find_element_by_name("nextButton")
+                isloaded = func()
             except:
-                if not isloaded:
-                    condition = None
-                    nextButton = None
-                    continue
-                break
-
-            if not condition and not nextButton:
-                if not isloaded:
-                    continue
-                break
-
-            if not condition.get_attribute("title") == page_1:
-                if not isloaded:
-                    continue
-                break
-
-            try:
-                condition.click()
-                nextButton.click()
-                isloaded = True
-            except:
-                driver.save_screenshot(view["output"] + "page_01_error_01" + timestamp + '.png')
-                
-
-        if trial >= NTRIAL:
-            driver.save_screenshot(view["output"] + "page_01_error_02" + timestamp + '.png')
-            continue
-
-        isloaded = False
-        trial = 0
-        while trial < NTRIAL :
-
-            trial+=1
-            time.sleep(s+random_number_gen(jit_s))
-            try:
-                headline = driver.find_element_by_id("inner_Booking")
-                guichet_list = driver.find_elements_by_class_name("radio")
-                nextButton = driver.find_element_by_name("nextButton")
-            except:
-                if not isloaded:
-                    headline = None
-                    guichet_list = None
-                    nextButton = None
-                    continue
-                break
-
-            if not guichet_list or not nextButton or not headline :
-                if not isloaded:
-                    continue
-                break
-
-            if not  page_2 in headline.text:
-                if not isloaded:
-                    continue
-                break             
-
-            try:
-                guichet_list[i].click()
-                nextButton.click()
-                isloaded=True
-            except:
-                driver.save_screenshot(view["output"] + "page_02_error_01" + timestamp + '.png')
-                
-        if trial >= NTRIAL:
-            driver.save_screenshot(view["output"] + "page_02_error_02" + timestamp + '.png')
-            continue
-            
+                continue
+        return trial
 
 
-
-        try:
-            form = driver.find_elements_by_xpath("//form[@id='FormBookingCreate']")
-        except:
-            form = None
-
-        if not form:
-            driver.save_screenshot(view["output"] + "newwebpagewithoutform" + timestamp + '.png')
-            with codecs.open(view["output"] + "newwebpagewithoutform" + timestamp + '.html','w+',"utf-8") as fid:
-                fid.write(driver.page_source)
-            continue
+class PalaiseauCrawler(WebCrawler):
+    def __init__(self,driver,options):
+        super().__init__(driver,options)
+        self.crawlpath = [self.GetPageZero,self.GetPageOne,self.GetPageTwo,self.GetPageThree,self.GetSnapShot]    
 
 
-        if form[0].text == "Il n'existe plus de plage horaire libre pour votre demande de rendez-vous. Veuillez recommencer ultérieurement.":
-            continue
-  
-        driver.save_screenshot(view["output"] + "newwebpagewithform" + timestamp + '.png')
+    def GetPageZero(self):
+        
+        link = 'https://' + "www.essonne.gouv.fr/booking/create/23014/0"
+        self.driver.get(link)
+        return True
 
-        with codecs.open(view["output"] + "newwebpagewithform" + timestamp + '.html','w+',"utf-8") as fid:
-            fid.write(driver.page_source)
+    def GetPageOne(self):
+        
+        page_1 = "Cliquez la case pour accepter les conditions d'utilisation avant de continuer le processus de prise de rendez-vous."
+        condition = self.driver.find_element_by_id("condition")
+        nextButton = self.driver.find_element_by_name("nextButton") 
 
-        i = (i+1)%5
+        if not condition.get_attribute("title") == page_1:
+            return False
+
+        condition.click()
+        nextButton.click()
+        return True
+
+    def GetPageTwo(self):
+        
+        page_2 = "Choix de la nature du rendez-vous"
+        i = random.randint(0,4)
+        headline = self.driver.find_element_by_id("inner_Booking")
+        guichet_list = self.driver.find_elements_by_class_name("radio")
+        nextButton = self.driver.find_element_by_name("nextButton")
+
+        if not page_2 in headline.text:
+            return False
+
+        guichet_list[i].click()
+        nextButton.click()
+
+        return True
+
+    def GetPageThree(self):
+        
+        page_3 = "Description de la nature du rendez-vous"
+        nextButton = self.driver.find_element_by_name("nextButton")
+        headline = self.driver.find_element_by_id("inner_Booking")
+
+        if not page_3 in headline.text:
+            return False
+
+        nextButton.click()
+
+        return True  
+
+    def GetSnapShot(self):
+        
+        self.driver.save_screenshot("newwebpage" + self.timestamp + '.png')
+
+        with codecs.open("newwebpage" + self.timestamp + '.html','w+',"utf-8") as fid:
+            fid.write(self.driver.page_source)
+
+        return True  
+
+if __name__ == "__main__":
+
+
+    view = {'output': dir + "prefecture_" ,
+                'width': 1000,
+                'height': 800}
+
+    firefox_options = webdriver.FirefoxOptions()
+    firefox_options.set_headless() 
+    driver = webdriver.Firefox(firefox_options=firefox_options)
+    driver.set_window_size(view['width'], view['height'])    
+
+    options = {"NTRIAL" : NTRIAL,
+                "BUFFER" : BUFFER,
+                "BUFFER_JIT":BUFFER_JIT}
+
+
+    crawler = PalaiseauCrawler(driver,options)
+    crawler.Main()
+
+
+
