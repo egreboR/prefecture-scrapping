@@ -25,7 +25,7 @@ class WebCrawler():
                 break
 
     def InteractWPage(self,func):
-        logging.info(f"interacting with {func.__name__}")
+        logging.info(f"[{self.timestamp}] interacting with {func.__name__}")
         isloaded = False
         trial = 0            
         while trial < self.ntrial and not isloaded:
