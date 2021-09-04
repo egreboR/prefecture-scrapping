@@ -133,26 +133,4 @@ if __name__ == "__main__":
     crawler = YahooCrawler(yf,options)
     crawler.Main()    
 
-    rate = 1.8
 
-    for i in range(cg.get_state(),cg.get_limit()):
-
-        ticker_name = cg.next_combination()
-        trial = 0
-        while trial < 5:
-            try:
-                ticker = yf.Ticker(ticker_name)
-                doc = dumps(ticker.info)
-                print(ticker.info)
-                if len(doc)>44:
-                    print(mycol.insert_one(ticker.info))
-                break
-            except:
-                trial=+1
-            sleep(3)
-            
-        if trial == 5:
-            logger.warning(f'{ticker_name} could not be fetch into the database')
-
-
-        sleep(rate)
