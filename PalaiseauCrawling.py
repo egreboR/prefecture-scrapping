@@ -28,8 +28,11 @@ def random_number_gen(n):
 class PalaiseauCrawler(WebCrawler):
     def __init__(self,driver,options):
         super().__init__(driver,options)
-        self.crawlpath = [self.GetPageZero,self.GetPageOne,self.GetPageTwo,self.GetPageThree,self.GetSnapShot]    
-
+        self.crawlpath = [self.GetPageZero,self.GetPageOne,self.GetPageTwo,self.GetPageThree,self.GetSnapShot]  
+          
+        self.logging = logging
+        self.logging.basicConfig(filename=f"{dir}palaiseau_log.txt",level=logging.INFO)
+        self.logging = logging.getLogger("palaiseau_scrapper")
 
     def GetPageZero(self):
         
