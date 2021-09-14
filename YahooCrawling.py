@@ -101,6 +101,7 @@ class YahooCrawler(WebCrawler):
         self.logging = logging.getLogger("yahoo_scrapper")
 
         self.combination_generator = combination_generator(10)
+        self.dbconn = YahooMongoDb()
 
     def GenerateStockSymbol(self):  
         self.ticker_name = self.combination_generator.next_combination()
@@ -111,12 +112,11 @@ class YahooCrawler(WebCrawler):
         
         ticker = self.driver.Ticker(self.ticker_name)
         data = {"index":self.ticker_name,"data" : ticker.info}
-        with open(f"{dir}yahoo_response.txt",'a') as fid:
-            fid.write(f"{dumps(data)}\n")
-
-        # if not page_3 in headline.text:
-        #     return False
-
+        
+        try:
+            self.dbconn.insert(data)
+        except:
+            self.logging.warn(f"Could not fetch {data['index']} in mongo")
 
         return True
 
