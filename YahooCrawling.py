@@ -72,7 +72,7 @@ class combination_generator():
 
 class YahooMongoDb():
 
-    def __init__(self,config_file):
+    def __init__(self):
 
         config_file =  f"{dir}yahoo_config_file.txt"
 
