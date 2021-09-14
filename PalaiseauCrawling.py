@@ -78,6 +78,12 @@ class PalaiseauCrawler(WebCrawler):
         if not page_3 in headline.text:
             return False
 
+
+        self.driver.save_screenshot("page3_" + self.timestamp + '.png')
+
+        with codecs.open("page3_" + self.timestamp + '.html','w+',"utf-8") as fid:
+            fid.write(self.driver.page_source)
+
         nextButton.click()
 
         return True  
