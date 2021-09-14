@@ -79,7 +79,7 @@ class YahooMongoDb():
         with open(config_file) as fid:
             url = fid.read()
 
-        self.mongoclient = self.pymongo.MongoClient(url)   
+        self.mongoclient = pymongo.MongoClient(url)   
         actual_db = self.mongoclient.list_database_names()
         mydb = self.mongoclient["yahoo"]
         self.mycol = mydb["symbols"]
