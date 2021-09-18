@@ -17,7 +17,7 @@ else:
 
 ### need configuration file
 BUFFER_JIT = 0
-BUFFER = 1
+BUFFER = 0.5
 NTRIAL = 5
 
 
@@ -31,7 +31,7 @@ class combination_generator():
             with open(self.tmp_state,"r") as fid:
                 self.old_state = int(fid.read())
         
-        self.char_space = f"{string.digits}{string.ascii_uppercase}{string.punctuation}"
+        self.char_space = f"{string.digits}{string.ascii_uppercase}.-"
         self.char_space_length = len(self.char_space)
         self.limit = pow(self.char_space_length,n_char)
         self.index_gen = (i for i in range(self.old_state,self.limit))
