@@ -75,14 +75,14 @@ class PalaiseauCrawler(WebCrawler):
         nextButton = self.driver.find_element_by_name("nextButton")
         headline = self.driver.find_element_by_id("inner_Booking")
 
-        if not page_3 in headline.text:
-            return False
-
-
         self.driver.save_screenshot("page3_" + self.timestamp + '.png')
 
         with codecs.open("page3_" + self.timestamp + '.html','w+',"utf-8") as fid:
             fid.write(self.driver.page_source)
+
+        if not page_3 in headline.text:
+            return False
+
 
         nextButton.click()
 
