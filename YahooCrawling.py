@@ -81,8 +81,8 @@ class YahooMongoDb():
 
         self.mongoclient = pymongo.MongoClient(url)   
         actual_db = self.mongoclient.list_database_names()
-        mydb = self.mongoclient["yahoo"]
-        self.mycol = mydb["symbols"]
+        self.mydb = self.mongoclient["yahoo"]
+        self.mycol = self.mydb["symbols"]
 
         if "yahoo" not in actual_db:
             self.mydb.mycol.create_index('index')
