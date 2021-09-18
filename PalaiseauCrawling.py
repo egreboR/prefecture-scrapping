@@ -75,9 +75,9 @@ class PalaiseauCrawler(WebCrawler):
         nextButton = self.driver.find_element_by_name("nextButton")
         headline = self.driver.find_element_by_id("inner_Booking")
 
-        self.driver.save_screenshot("page3_" + self.timestamp + '.png')
+        self.driver.save_screenshot(dir + "page3_" + self.timestamp + '.png')
 
-        with codecs.open("page3_" + self.timestamp + '.html','w+',"utf-8") as fid:
+        with codecs.open(dir + "page3_" + self.timestamp + '.html','w+',"utf-8") as fid:
             fid.write(self.driver.page_source)
 
         if not page_3 in headline.text:
@@ -90,9 +90,9 @@ class PalaiseauCrawler(WebCrawler):
 
     def GetSnapShot(self):
         
-        self.driver.save_screenshot("newwebpage" + self.timestamp + '.png')
+        self.driver.save_screenshot(dir + "newwebpage" + self.timestamp + '.png')
 
-        with codecs.open("newwebpage" + self.timestamp + '.html','w+',"utf-8") as fid:
+        with codecs.open(dir + "newwebpage" + self.timestamp + '.html','w+',"utf-8") as fid:
             fid.write(self.driver.page_source)
 
         return True  
