@@ -70,15 +70,24 @@ class PalaiseauCrawler(WebCrawler):
         return True
 
     def GetPageThree(self):
-        
-        page_3 = "Description de la nature du rendez-vous"
-        nextButton = self.driver.find_element_by_name("nextButton")
-        headline = self.driver.find_element_by_id("inner_Booking")
+
+
+        headline = self.driver.find_element_by_id("FormBookingCreate")
+        page_3 = "Il n'existe plus de plage horaire libre pour votre demande de rendez-vous. Veuillez recommencer ultérieurement. "
+
+        if page_3 in headline.text:
+            return False
 
         self.driver.save_screenshot(dir + "page3_" + self.timestamp + '.png')
 
         with codecs.open(dir + "page3_" + self.timestamp + '.html','w+',"utf-8") as fid:
             fid.write(self.driver.page_source)
+
+        page_3 = "Description de la nature du rendez-vous"
+        nextButton = self.driver.find_element_by_name("nextButton")
+        headline = self.driver.find_element_by_id("inner_Booking")
+
+
 
         if not page_3 in headline.text:
             return False
