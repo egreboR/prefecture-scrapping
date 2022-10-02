@@ -1,0 +1,4 @@
+*.pyc
+geckodriver.exe
+geckodriver.log
+prefecture-scrapping.log

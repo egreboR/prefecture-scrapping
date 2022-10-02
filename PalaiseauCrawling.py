@@ -73,9 +73,9 @@ class PalaiseauCrawler(WebCrawler):
 
 
         headline = self.driver.find_element_by_id("FormBookingCreate")
-        page_3 = "Il n'existe plus de plage horaire libre pour votre demande de rendez-vous. Veuillez recommencer ultérieurement. "
+        page_3 = "Il n'existe plus de plage horaire libre pour votre demande de rendez-vous. Veuillez recommencer ultérieurement."
 
-        if page_3 in headline.text:
+        if page_3 == headline.text:
             return False
 
         self.driver.save_screenshot(dir + "page3_" + self.timestamp + '.png')
