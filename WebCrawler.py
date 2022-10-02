@@ -33,6 +33,7 @@ class WebCrawler():
             time.sleep(self.buffer + self.jit)      
             try:
                 isloaded = func()
-            except:
+            except Exception as e:
+                logging.info(e)
                 continue
         return trial
