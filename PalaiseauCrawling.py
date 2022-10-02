@@ -56,7 +56,7 @@ class PalaiseauCrawler(WebCrawler):
     def GetPageTwo(self):
         
         page_2 = "Choix de la nature du rendez-vous"
-        i = random.randint(0,4)
+        i = random.randint(0,2)
         headline = self.driver.find_element_by_id("inner_Booking")
         guichet_list = self.driver.find_elements_by_class_name("radio")
         nextButton = self.driver.find_element_by_name("nextButton")
@@ -94,6 +94,8 @@ class PalaiseauCrawler(WebCrawler):
 
         with codecs.open(dir + "newwebpage" + self.timestamp + '.html','w+',"utf-8") as fid:
             fid.write(self.driver.page_source)
+
+        ### send email to address
 
         return True  
 
