@@ -56,7 +56,7 @@ class PalaiseauCrawler(WebCrawler):
     def GetPageTwo(self):
         
         page_2 = "Choix de la nature du rendez-vous"
-        i = random.randint(0,2)
+        i = random.randint(0,1)
         headline = self.driver.find_element_by_id("inner_Booking")
         guichet_list = self.driver.find_elements_by_class_name("radio")
         nextButton = self.driver.find_element_by_name("nextButton")

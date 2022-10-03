@@ -34,6 +34,6 @@ class WebCrawler():
             try:
                 isloaded = func()
             except Exception as e:
-                logging.info(e)
+                logging.error(e)
                 continue
         return trial
