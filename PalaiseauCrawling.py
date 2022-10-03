@@ -15,8 +15,8 @@ else:
 logging.basicConfig(filename=os.path.join(dir,'prefecture-scrapping.log'), level=logging.DEBUG)
 
 ### need configuration file
-BUFFER_JIT = 2
-BUFFER = 15
+BUFFER_JIT = 30
+BUFFER = 60
 NTRIAL = 5
 
 
