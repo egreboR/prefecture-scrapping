@@ -6,6 +6,8 @@ from json import dumps
 from time import sleep
 import logging
 from WebCrawler import WebCrawler
+from threading import Thread,Lock
+
 
 
 
@@ -56,11 +58,6 @@ class combination_generator():
     def next_combination(self):
 
         self.old_state = self.index_gen.__next__()
-        
-        if self.old_state%self.save_rate == 0:
-            with open(self.tmp_state,"w+") as fid:
-                fid.write(str(self.old_state))
-
         return self.__toList__(self.old_state)
 
     def get_limit(self):
@@ -68,6 +65,10 @@ class combination_generator():
 
     def get_state(self):
         return self.old_state
+    
+    def save_state(self):
+        with open(self.tmp_state,"w+") as fid:
+            fid.write(str(self.old_state))
 
 
 class YahooMongoDb():
@@ -92,7 +93,7 @@ class YahooMongoDb():
 
 class YahooCrawler(WebCrawler):
 
-    def __init__(self,driver,options):
+    def __init__(self,driver,stock_symbol,options):
         super().__init__(driver,options)
         self.crawlpath = [self.GenerateStockSymbol,self.GetSymbol]        
 
@@ -100,11 +101,11 @@ class YahooCrawler(WebCrawler):
         self.logging.basicConfig(filename=f"{dir}yahoo_log.txt",level=logging.INFO)
         self.logging = logging.getLogger("yahoo_scrapper")
 
-        self.combination_generator = combination_generator(10)
+        self.stock_symbol = stock_symbol
         self.dbconn = YahooMongoDb()
 
     def GenerateStockSymbol(self):  
-        self.ticker_name = self.combination_generator.next_combination()
+        self.ticker_name = self.stock_symbol.GetNextStockSymbol()
         return True
 
 
@@ -120,6 +121,29 @@ class YahooCrawler(WebCrawler):
 
         return True
 
+class StockSymbol():
+
+    def __init__(self):
+        self.combination_generator = combination_generator(10)
+        self.symbol = ""
+        self.lock = Lock()
+
+    def GetNextStockSymbol(self):  
+        with self.lock:
+            self.symbol = self.combination_generator.next_combination()
+            return self.symbol
+
+    def GetCurrentState(self):
+        with self.lock:
+            return self.combination_generator.get_state()
+        
+    def GetCurrentStock(self):
+        with self.lock:
+            return self.symbol
+        
+    
+    def SaveState(self):
+        return self.combination_generator.save_state()
 
 if __name__ == "__main__":
 
@@ -129,8 +153,24 @@ if __name__ == "__main__":
                 "BUFFER_JIT":BUFFER_JIT}    
 
 
+    stock_symbol = StockSymbol()
+    crawler_01 = YahooCrawler(yf,stock_symbol,options)
+    crawler_02 = YahooCrawler(yf,stock_symbol,options)
+    # crawler_03 = YahooCrawler(yf,stock_symbol,options)
+    # crawler.Main()
 
-    crawler = YahooCrawler(yf,options)
-    crawler.Main()    
+    
+    crawler_01_thread = Thread(target=crawler_01.Main)
+    crawler_02_thread = Thread(target=crawler_02.Main)
+    # crawler_03_thread = Thread(target=crawler_03.Main)
 
+    crawler_01_thread.start()
+    crawler_02_thread.start()
+    # crawler_03_thread.start()
+
+    while True:
+        
+        print(f"current stock symbol is : {stock_symbol.GetCurrentState()}  -  {stock_symbol.GetCurrentStock()} " )
+        stock_symbol.SaveState()
+        sleep(60)
 
